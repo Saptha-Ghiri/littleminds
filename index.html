@@ -1,0 +1,104 @@
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | PenChamp</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+    <style>
+      #unity-container {
+        display: none;
+      }
+      #fullscreen-trigger {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        z-index: 1000;
+      }
+    </style>
+  </head>
+  <body>
+    <div style="color: green;font-size: 100px;" id="fullscreen-trigger" onclick="enableFullScreen()"><svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" viewBox="0 0 24 24"><path fill="currentColor" d="M8 17.175V6.825q0-.425.3-.713t.7-.287q.125 0 .263.037t.262.113l8.15 5.175q.225.15.338.375t.112.475t-.112.475t-.338.375l-8.15 5.175q-.125.075-.262.113T9 18.175q-.4 0-.7-.288t-.3-.712m2-1.825L15.25 12L10 8.65z"/></svg></div>
+
+    <div id="unity-container" class="unity-desktop">
+      <canvas id="unity-canvas" width="1024" height="600"></canvas>
+      <div id="unity-loading-bar">
+        <div id="unity-logo"></div>
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
+        </div>
+      </div>
+      <div id="unity-warning"></div>
+      <div id="unity-footer">
+        <div id="unity-webgl-logo"></div>
+        <div id="unity-fullscreen-button"></div>
+        <div id="unity-build-title">PenChamp</div>
+      </div>
+    </div>
+
+    <script>
+      var container = document.querySelector("#unity-container");
+      var canvas = document.querySelector("#unity-canvas");
+      var loadingBar = document.querySelector("#unity-loading-bar");
+      var progressBarFull = document.querySelector("#unity-progress-bar-full");
+      var fullscreenTrigger = document.querySelector("#fullscreen-trigger");
+
+      function enableFullScreen() {
+        fullscreenTrigger.style.display = "none"; // Hide the fullscreen trigger
+        container.style.display = "block"; // Show the game container
+
+        // Request fullscreen mode
+        if (canvas.requestFullscreen) {
+          canvas.requestFullscreen();
+        } else if (canvas.webkitRequestFullscreen) {
+          canvas.webkitRequestFullscreen();
+        } else if (canvas.msRequestFullscreen) {
+          canvas.msRequestFullscreen();
+        }
+
+        // Load the Unity instance
+        loadUnity();
+      }
+
+      function loadUnity() {
+        var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/new_out_2.loader.js";
+      var config = {
+        dataUrl: buildUrl + "/new_out_2.data.unityweb",
+        frameworkUrl: buildUrl + "/new_out_2.framework.js.unityweb",
+        codeUrl: buildUrl + "/new_out_2.wasm.unityweb",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "PenChamp",
+        productName: "PenChamp",
+        productVersion: "1.0",
+      };
+        
+
+        loadingBar.style.display = "block";
+
+        var script = document.createElement("script");
+        script.src = loaderUrl;
+        script.onload = () => {
+          createUnityInstance(canvas, config, (progress) => {
+            progressBarFull.style.width = 100 * progress + "%";
+          }).then((unityInstance) => {
+            loadingBar.style.display = "none";
+          }).catch((message) => {
+            alert(message);
+          });
+        };
+        document.body.appendChild(script);
+      }
+    </script>
+  </body>
+</html>
